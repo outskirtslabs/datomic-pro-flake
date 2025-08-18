@@ -115,7 +115,7 @@ makeTest {
         #                   :main-opts ["-m" "hello"]}}}
         #'';
         environment.etc."datomic-docker/hello.clj".text = builtins.readFile ./fixtures/hello.clj;
-        environment.etc."datomic-docker/.env".text = "IMAGE=ghcr.io/ramblurr/datomic-pro:${pkgs.datomic-pro.version}";
+        environment.etc."datomic-docker/.env".text = "IMAGE=ghcr.io/outskirtslabs/datomic-pro:${pkgs.datomic-pro.version}";
       };
   };
 

@@ -1,8 +1,8 @@
 # datomic-pro-flake
 
 [![FlakeHub](https://img.shields.io/endpoint?url=https://flakehub.com/f/ramblurr/datomic-pro/badge)](https://flakehub.com/flake/ramblurr/datomic-pro)
-[![GitHub License](https://img.shields.io/github/license/ramblurr/datomic-pro-flake)](./LICENSE)
-[![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/ramblurr/datomic-pro-flake/ci.yml)](https://github.com/Ramblurr/datomic-pro-flake/actions/workflows/ci.yml)
+[![GitHub License](https://img.shields.io/github/license/outskirtslabs/datomic-pro-flake)](./LICENSE)
+[![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/outskirtslabs/datomic-pro-flake/ci.yml)](https://github.com/outskirtslabs/datomic-pro-flake/actions/workflows/ci.yml)
 
 ️ This flake exposes:
 
@@ -60,7 +60,7 @@ And for peer:
   inputs.
    inputs = {
         nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-        # Check https://github.com/Ramblurr/datomic-pro-flake/releases for the latest release tag
+        # Check https://github.com/outskirtslabs/datomic-pro-flake/releases for the latest release tag
         datomic-pro.url = "https://flakehub.com/f/Ramblurr/datomic-pro/0.7.0.tar.gz";
         datomic-pro.nixpkgs = "nixpkgs";
     };
@@ -144,10 +144,10 @@ This flake also provides a container image for Datomic Pro that can be driven en
 If you don't want to build the container image yourself with nix, you can get the latest image with:
 
 ``` shell
-docker/podman pull ghcr.io/ramblurr/datomic-pro:1.0.7387
+docker/podman pull ghcr.io/outskirtslabs/datomic-pro:1.0.7387
 ```
 
-The available tags you can find here: https://github.com/users/Ramblurr/packages/datomic-pro-flake/package/datomic-pro
+The available tags you can find here: https://github.com/orgs/outskirtslabs/packages/datomic-pro-flake/package/datomic-pro
 
 ### Transactor Mode
 
@@ -227,7 +227,7 @@ Be sure to `mkdir data/ config/` before running this.
 ---
 services:
   datomic-transactor:
-    image: ghcr.io/ramblurr/datomic-pro:1.0.7387
+    image: ghcr.io/outskirtslabs/datomic-pro:1.0.7387
     environment:
       DATOMIC_STORAGE_ADMIN_PASSWORD: unsafe
       DATOMIC_STORAGE_DATOMIC_PASSWORD: unsafe
@@ -238,7 +238,7 @@ services:
     #user: 1000:1000 # if using rootful containers uncomment this
 
   datomic-console:
-    image: ghcr.io/ramblurr/datomic-pro:1.0.7387
+    image: ghcr.io/outskirtslabs/datomic-pro:1.0.7387
     command: console
     environment:
       DB_URI: datomic:dev://datomic-transactor:4334/?password=unsafe
@@ -278,7 +278,7 @@ services:
 ---
 services:
   datomic-transactor:
-    image: ghcr.io/ramblurr/datomic-pro:unstable
+    image: ghcr.io/outskirtslabs/datomic-pro:unstable
     environment:
       DATOMIC_PROTOCOL: sql
       DATOMIC_SQL_URL: jdbc:sqlite:/data/datomic-sqlite.db
@@ -293,7 +293,7 @@ services:
       - 127.0.0.1:4334:4334
 
   datomic-console:
-    image: ghcr.io/ramblurr/datomic-pro:unstable
+    image: ghcr.io/outskirtslabs/datomic-pro:unstable
     command: console
     environment:
       # you don’t specify the db name in the uri (because console can access all dbs)
@@ -347,7 +347,7 @@ services:
       retries: 30
 
   datomic-storage-migrator:
-    image: ghcr.io/ramblurr/datomic-pro:1.0.7387
+    image: ghcr.io/outskirtslabs/datomic-pro:1.0.7387
     environment:
       PGUSER: postgres
       PGPASSWORD: unsafe
@@ -363,7 +363,7 @@ services:
         condition: service_healthy
 
   datomic-transactor:
-    image: ghcr.io/ramblurr/datomic-pro:1.0.7387
+    image: ghcr.io/outskirtslabs/datomic-pro:1.0.7387
     environment:
       DATOMIC_STORAGE_ADMIN_PASSWORD: unsafe
       DATOMIC_STORAGE_DATOMIC_PASSWORD: unsafe
@@ -394,7 +394,7 @@ services:
         condition: service_completed_successfully
 
   datomic-console:
-    image: ghcr.io/ramblurr/datomic-pro:1.0.7387
+    image: ghcr.io/outskirtslabs/datomic-pro:1.0.7387
     command: console
     environment:
       DB_URI: datomic:sql://?jdbc:postgresql://datomic-storage:5432/datomic?user=datomic&password=datomic
@@ -406,24 +406,16 @@ services:
 
 ### Discussion
 
-Feel free to [open an issue](https://github.com/Ramblurr/datomic-pro-flake/issues/new) or reach out to me on the Clojurians slack ([@Ramblurr](https://clojurians.slack.com/team/U70QFSCG2)).
+Feel free to [open an issue](https://github.com/outskirtslabs/datomic-pro-flake/issues/new) or reach out to me on the Clojurians slack ([@Ramblurr](https://clojurians.slack.com/team/U70QFSCG2)).
 
-## License
+## Security
 
-The contents of this flake is licensed under the Apache-2.0, just like Datomic Pro itself.
+See [here][sec] for security advisories or to report a security vulnerability.
 
-```
-Copyright 2024-2025 Casey Link
+[sec]: https://github.com/outskirtslabs/datomic-pro-flake/security/advisories
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+## License: Apache License 2.0
 
-    http://www.apache.org/licenses/LICENSE-2.0
+Copyright © 2025 Casey Link <casey@outskirtslabs.com>
 
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-```
+Distributed under the [Apache-2.0](https://spdx.org/licenses/Apache-2.0.html), just like Datomic Pro itself.

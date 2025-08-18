@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [UNRELEASED]
 
+The project repository has moved from my personal github to my open-source project org:
+
+- from https://github.com/Ramblurr/datomic-pro-flake
+- to https://github.com/outskirtslabs/datomic-pro-flake/
+
 ## v0.7.0 (2025-07-09)
 
 This is a version bump release:

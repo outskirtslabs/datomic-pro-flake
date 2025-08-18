@@ -61,7 +61,7 @@ let
   '';
 in
 dockerTools.buildLayeredImage {
-  name = "ghcr.io/ramblurr/datomic-pro";
+  name = "ghcr.io/outskirtslabs/datomic-pro";
   tag = imageTag;
   fromImage = null;
   contents = [
@@ -83,9 +83,10 @@ dockerTools.buildLayeredImage {
       "TZ=Etc/UTC"
     ];
     Labels = {
-      "org.opencontainers.image.authors" = "github.com/ramblurr";
-      "org.opencontainers.image.url" = "https://github.com/Ramblurr/datomic-pro-flake/tree/main/pkgs/datomic-pro-container-image.nix";
-      "org.opencontainers.image.source" = "https://github.com/Ramblurr/datomic-pro-flake";
+      "org.opencontainers.image.authors" = "github.com/outskirtslabs";
+      "org.opencontainers.image.url" =
+        "https://github.com/outskirtslabs/datomic-pro-flake/tree/main/pkgs/datomic-pro-container-image.nix";
+      "org.opencontainers.image.source" = "https://github.com/outskirtslabs/datomic-pro-flake";
       "org.opencontainers.image.description" = "Datomic Pro";
       "org.opencontainers.image.version" = datomicBuild.version;
       "org.opencontainers.image.licenses" = "Apache-2.0";
