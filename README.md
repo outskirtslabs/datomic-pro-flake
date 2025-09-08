@@ -1,6 +1,6 @@
 # datomic-pro-flake
 
-[![FlakeHub](https://img.shields.io/endpoint?url=https://flakehub.com/f/ramblurr/datomic-pro/badge)](https://flakehub.com/flake/ramblurr/datomic-pro)
+[![FlakeHub](https://img.shields.io/endpoint?url=https://flakehub.com/f/outskirtslabs/datomic-pro/badge)](https://flakehub.com/flake/outskirtslabs/datomic-pro)
 [![GitHub License](https://img.shields.io/github/license/outskirtslabs/datomic-pro-flake)](./LICENSE)
 [![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/outskirtslabs/datomic-pro-flake/ci.yml)](https://github.com/outskirtslabs/datomic-pro-flake/actions/workflows/ci.yml)
 
