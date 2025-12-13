@@ -2,6 +2,10 @@
 rec {
   # Note: the latest version must be the first one in this file
   #       because the ci pipeline detects the "current" version that way
+  datomic-pro_1_0_7469 = pkgs.callPackage ./datomic-pro.nix {
+    version = "1.0.7469";
+    hash = "sha256-OgUuDc1sFpAP4Spx/ca2u8LsrrQK2X4cwB0ve+lQcBg=";
+  };
   datomic-pro_1_0_7394 = pkgs.callPackage ./datomic-pro.nix {
     version = "1.0.7394";
     hash = "sha256-KoW6OqoQHgaGQytglHOaUdC5iqnCRKp+Klv5Ti+UAfI=";
@@ -18,7 +22,12 @@ rec {
     version = "1.0.7277";
     hash = "sha256-fqmw+MOUWPCAhHMROjP48BwWCcRknk+KECM3WvF/Ml4=";
   };
-  datomic-pro = datomic-pro_1_0_7394;
+  datomic-pro = datomic-pro_1_0_7469;
+  datomic-pro-peer_1_0_7469 = pkgs.callPackage ./datomic-pro-peer.nix {
+    version = "1.0.7469";
+    mvnHash = "sha256-zoRBD41qnaV/XP9qwEYxFdn2JH6LR9udDCCTsYacY74=";
+    zipHash = "sha256-OgUuDc1sFpAP4Spx/ca2u8LsrrQK2X4cwB0ve+lQcBg=";
+  };
   datomic-pro-peer_1_0_7394 = pkgs.callPackage ./datomic-pro-peer.nix {
     version = "1.0.7394";
     mvnHash = "sha256-zoRBD41qnaV/XP9qwEYxFdn2JH6LR9udDCCTsYacY74=";
@@ -39,5 +48,5 @@ rec {
     mvnHash = "sha256-09AKaahc4MSc0d/gWJyMpB60O7WZOauj7vS1X4rtPjI=";
     zipHash = "sha256-fqmw+MOUWPCAhHMROjP48BwWCcRknk+KECM3WvF/Ml4=";
   };
-  datomic-pro-peer = datomic-pro-peer_1_0_7394;
+  datomic-pro-peer = datomic-pro-peer_1_0_7469;
 }
