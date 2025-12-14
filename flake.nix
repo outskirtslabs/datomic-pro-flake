@@ -1,6 +1,6 @@
 {
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
     flake-utils.url = "github:numtide/flake-utils";
     clj-nix.url = "github:jlesquembre/clj-nix";
     snowfall-drift = {
@@ -49,7 +49,8 @@
           datomic-pro-container = pkgs.datomic-pro-container;
           datomic-pro-container-unstable = pkgs.datomic-pro-container-unstable;
           datomic-generate-properties = pkgs.datomic-generate-properties;
-        } // builtins.mapAttrs (name: _: pkgs.${name}) versions;
+        }
+        // builtins.mapAttrs (name: _: pkgs.${name}) versions;
         nixosModules = {
           datomic-pro = import ./nixos-modules/datomic-pro.nix;
           datomic-console = import ./nixos-modules/datomic-console.nix;
