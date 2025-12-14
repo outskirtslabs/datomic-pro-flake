@@ -31,6 +31,7 @@ in
         type = lib.types.package;
         description = "Which datomic-pro package to use.";
         relatedPackages = [
+          "datomic-pro_1_0_7469"
           "datomic-pro_1_0_7394"
           "datomic-pro_1_0_7387"
           "datomic-pro_1_0_7364"
@@ -190,7 +191,7 @@ in
           '';
         base =
           if lib.versionAtLeast config.system.stateVersion "26.05" then
-            pkgs.datomic-pro_1_0_7394
+            pkgs.datomic-pro_1_0_7469
           else if lib.versionAtLeast config.system.stateVersion "25.11" then
             pkgs.datomic-pro_1_0_7387
           else if lib.versionAtLeast config.system.stateVersion "24.11" then
