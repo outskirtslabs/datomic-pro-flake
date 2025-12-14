@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [UNRELEASED]
 
+## v0.9.0 (2025-12-14)
+
+This is also a version bump release:
+
+- Added package versions for [version 1.0.7394](https://docs.datomic.com/changes/pro.html#1.0.7394)
+
+`pkgs.datomic-pro` will always be the latest release, but the following specific versions are also available:
+
+-  `pkgs.datomic-pro_1_0_7469` (latest)
+-  `pkgs.datomic-pro_1_0_7394`
+-  `pkgs.datomic-pro_1_0_7387`
+-  `pkgs.datomic-pro_1_0_7364`
+-  `pkgs.datomic-pro_1_0_7277`
+
+And for peer:
+
+-  `pkgs.datomic-pro-peer_1_0_7469` (latest)
+-  `pkgs.datomic-pro-peer_1_0_7394`
+-  `pkgs.datomic-pro-peer_1_0_7387`
+-  `pkgs.datomic-pro-peer_1_0_7364`
+-  `pkgs.datomic-pro-peer_1_0_7277`
+
 ## v0.8.0 (2025-09-08)
 
 The project repository has moved from my personal github to my open-source project org:
