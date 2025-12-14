@@ -214,13 +214,12 @@ in
       script = ''
         ${cfg.package}/bin/datomic-transactor ${runtimePropertiesPath}
       '';
-      environment =
-        {
-          DATOMIC_JAVA_OPTS = toString extraJavaOptions;
-        }
-        // lib.optionalAttrs (cfg.extraClasspathEntries != [ ]) {
-          CLASSPATH = extraClasspath;
-        };
+      environment = {
+        DATOMIC_JAVA_OPTS = toString extraJavaOptions;
+      }
+      // lib.optionalAttrs (cfg.extraClasspathEntries != [ ]) {
+        CLASSPATH = extraClasspath;
+      };
       serviceConfig = {
         Type = "simple";
         DynamicUser = true;
