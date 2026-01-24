@@ -1,0 +1,12 @@
+{:tasks
+ {release {:doc "Check for new Datomic version and update flake"
+           :task (do (load-file "bb/release.bb")
+                     ((requiring-resolve 'release/release!) {}))}
+
+  release:build {:doc "Update and verify builds"
+                 :task (do (load-file "bb/release.bb")
+                           ((requiring-resolve 'release/release!) {:build? true}))}
+
+  test {:doc "Run tests"
+        :task (do (load-file "bb/release_test.bb")
+                  ((requiring-resolve 'clojure.test/run-tests) 'release-test))}}}
