@@ -59,7 +59,7 @@
   };"
           (version->attr version) version zip-hash))
 
-;; File updates
+;; versions.nix updates
 
 (defn insert-pro-entry [content version hash]
   (str/replace content
@@ -94,6 +94,64 @@
          (update-versions-content version hash)
          (spit file))))
 
+;; README updates
+
+(defn extract-versions
+  "Extract all datomic-pro versions from versions.nix content"
+  [versions-content]
+  (->> (re-seq #"datomic-pro_(\d+_\d+_\d+)\s*=" versions-content)
+       (map second)
+       (map #(str/replace % "_" "."))
+       distinct
+       vec))
+
+(defn generate-version-list
+  "Generate markdown list of versions"
+  [versions pkg-prefix]
+  (let [[latest & rest] versions]
+    (str/join "\n"
+              (concat [(format "-  `pkgs.%s_%s` (latest)" pkg-prefix (version->attr latest))]
+                      (map #(format "-  `pkgs.%s_%s`" pkg-prefix (version->attr %)) rest)))))
+
+(defn update-readme-version-lists
+  "Update the version lists in README"
+  [content versions]
+  (let [pro-list (generate-version-list versions "datomic-pro")
+        peer-list (generate-version-list versions "datomic-pro-peer")]
+    (-> content
+        ;; Update datomic-pro list
+        (str/replace #"(?s)(-  `pkgs\.datomic-pro_[^`]+`[^\n]*\n)+"
+                     (str pro-list "\n"))
+        ;; Update datomic-pro-peer list
+        (str/replace #"(?s)(-  `pkgs\.datomic-pro-peer_[^`]+`[^\n]*\n)+"
+                     (str peer-list "\n")))))
+
+(defn update-readme-examples
+  "Update hardcoded version numbers in examples"
+  [content old-version new-version]
+  (-> content
+      ;; Docker pull/image references
+      (str/replace (re-pattern (str "datomic-pro:" (str/escape old-version {\. "\\."})))
+                   (str "datomic-pro:" new-version))
+      ;; Package references in nix examples
+      (str/replace (re-pattern (str "datomic-pro_" (version->attr old-version)))
+                   (str "datomic-pro_" (version->attr new-version)))))
+
+(defn update-readme-content
+  "Update all version references in README"
+  [content versions old-version new-version]
+  (-> content
+      (update-readme-version-lists versions)
+      (update-readme-examples old-version new-version)))
+
+(defn update-readme-file!
+  "Update README.md with new version info"
+  [versions old-version new-version]
+  (let [file "README.md"]
+    (->> (slurp file)
+         (update-readme-content versions old-version new-version)
+         (spit file))))
+
 ;; Build verification
 
 (defn build-pro! []
@@ -122,6 +180,9 @@
           (println "Hash:" hash)
           (println "\nUpdating pkgs/versions.nix...")
           (update-versions-file! latest hash)
+          (println "Updating README.md...")
+          (let [versions (extract-versions (slurp "pkgs/versions.nix"))]
+            (update-readme-file! versions current latest))
           (println "Done!")
           (when build?
             (build-pro!)

@@ -36,6 +36,10 @@ rec {
     version = \"1.0.7469\";
     hash = \"sha256-OgUuDc1sFpAP4Spx/ca2u8LsrrQK2X4cwB0ve+lQcBg=\";
   };
+  datomic-pro_1_0_7394 = pkgs.callPackage ./datomic-pro.nix {
+    version = \"1.0.7394\";
+    hash = \"sha256-xxx\";
+  };
   datomic-pro = datomic-pro_1_0_7469;
   datomic-pro-peer_1_0_7469 = pkgs.callPackage ./datomic-pro-peer.nix {
     version = \"1.0.7469\";
@@ -83,6 +87,72 @@ rec {
 (deftest update-peer-alias-test
   (let [result (release/update-peer-alias sample-versions-nix "1.0.9999")]
     (is (str/includes? result "datomic-pro-peer = datomic-pro-peer_1_0_9999;"))))
+
+;; README tests
+
+(deftest extract-versions-test
+  (let [versions (release/extract-versions sample-versions-nix)]
+    (is (= ["1.0.7469" "1.0.7394"] versions))))
+
+(deftest generate-version-list-test
+  (let [versions ["1.0.7482" "1.0.7469" "1.0.7394"]
+        list (release/generate-version-list versions "datomic-pro")]
+    (is (str/includes? list "`pkgs.datomic-pro_1_0_7482` (latest)"))
+    (is (str/includes? list "`pkgs.datomic-pro_1_0_7469`"))
+    (is (str/includes? list "`pkgs.datomic-pro_1_0_7394`"))
+    (is (not (str/includes? list "1_0_7469` (latest)")))))
+
+(def sample-readme
+  "## Usage - Nix Package
+
+`pkgs.datomic-pro` will always be the latest release:
+
+-  `pkgs.datomic-pro_1_0_7394` (latest)
+-  `pkgs.datomic-pro_1_0_7387`
+
+And for peer:
+
+-  `pkgs.datomic-pro-peer_1_0_7394` (latest)
+-  `pkgs.datomic-pro-peer_1_0_7387`
+
+## Docker
+
+```shell
+docker pull ghcr.io/outskirtslabs/datomic-pro:1.0.7394
+```
+
+## Example
+
+```nix
+package = pkgs.datomic-pro_1_0_7394;
+```
+")
+
+(deftest update-readme-version-lists-test
+  (let [versions ["1.0.7482" "1.0.7469" "1.0.7394"]
+        result (release/update-readme-version-lists sample-readme versions)]
+    (testing "updates datomic-pro list"
+      (is (str/includes? result "`pkgs.datomic-pro_1_0_7482` (latest)"))
+      (is (str/includes? result "`pkgs.datomic-pro_1_0_7469`"))
+      (is (not (str/includes? result "`pkgs.datomic-pro_1_0_7387`"))))
+    (testing "updates peer list"
+      (is (str/includes? result "`pkgs.datomic-pro-peer_1_0_7482` (latest)")))))
+
+(deftest update-readme-examples-test
+  (let [result (release/update-readme-examples sample-readme "1.0.7394" "1.0.7482")]
+    (testing "updates docker image tags"
+      (is (str/includes? result "datomic-pro:1.0.7482"))
+      (is (not (str/includes? result "datomic-pro:1.0.7394"))))
+    (testing "updates nix package references"
+      (is (str/includes? result "datomic-pro_1_0_7482"))
+      (is (not (str/includes? result "datomic-pro_1_0_7394"))))))
+
+(deftest update-readme-content-test
+  (let [versions ["1.0.7482" "1.0.7469"]
+        result (release/update-readme-content sample-readme versions "1.0.7394" "1.0.7482")]
+    (testing "full update works"
+      (is (str/includes? result "1_0_7482` (latest)"))
+      (is (str/includes? result "datomic-pro:1.0.7482")))))
 
 (when (= *file* (System/getProperty "babashka.file"))
   (run-tests 'release-test))
