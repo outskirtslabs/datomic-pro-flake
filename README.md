@@ -12,6 +12,8 @@
 
 All of the above are [end-to-end tested](./tests) by the CI suite in this repo!
 
+**Automatic updates:** This flake checks for new Datomic releases daily. New versions are typically available within 24 hours of an official Datomic release.
+
 **Project status:** Experimental but ready for testing. Breaking changes may occur until version 1.0. The 1.0 release will be considered production-ready.
 
 <!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-refresh-toc -->

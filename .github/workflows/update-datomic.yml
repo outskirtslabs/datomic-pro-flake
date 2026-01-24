@@ -26,7 +26,7 @@ jobs:
         id: release
         run: |
           bb release:build
-          if git diff --quiet pkgs/versions.nix; then
+          if git diff --quiet pkgs/versions.nix README.md; then
             echo "changed=false" >> $GITHUB_OUTPUT
           else
             echo "changed=true" >> $GITHUB_OUTPUT
@@ -38,6 +38,6 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add pkgs/versions.nix
+          git add pkgs/versions.nix README.md
           git commit -m "Add datomic-pro ${{ steps.release.outputs.version }}"
           git push
