@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [UNRELEASED]
 
+- Updated nix flake to 25.11. From now on this flake will follow the stable
+  nixos releases. You can always override nixpkgs if you need to (to bump JDK
+  version etc).
+
 ## v0.9.0 (2025-12-14)
 
 This is a version bump release:
