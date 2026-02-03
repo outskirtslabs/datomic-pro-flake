@@ -12,12 +12,17 @@ jobs:
     permissions:
       id-token: write
       contents: write
-      pull-requests: write
-      actions: write
     steps:
       - uses: actions/checkout@v4
       - uses: DeterminateSystems/determinate-nix-action@v3
       - uses: DeterminateSystems/flakehub-cache-action@main
+
+      - name: Generate GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
 
       - name: Check for updates
         id: release
@@ -36,6 +41,7 @@ jobs:
           BRANCH="auto-update/datomic-${{ steps.release.outputs.version }}"
           git config user.name "Casey Link"
           git config user.email "14830+Ramblurr@users.noreply.github.com"
+          git remote set-url origin "https://x-access-token:${{ steps.app-token.outputs.token }}@github.com/${{ github.repository }}.git"
           git push origin --delete "$BRANCH" 2>/dev/null || true
           git checkout -b "$BRANCH"
           git add pkgs/versions.nix README.md CHANGELOG.md nixos-modules/datomic-pro.nix
@@ -45,11 +51,4 @@ jobs:
             --title "Add datomic-pro ${{ steps.release.outputs.version }}" \
             --body "Automated update to Datomic Pro ${{ steps.release.outputs.version }}"
         env:
-          GH_TOKEN: ${{ github.token }}
-
-      - name: Trigger CI
-        if: steps.release.outputs.changed == 'true'
-        run: |
-          gh workflow run ci.yml --ref "auto-update/datomic-${{ steps.release.outputs.version }}"
-        env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
