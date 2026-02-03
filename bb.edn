@@ -1,0 +1,13 @@
+{:paths ["scripts"]
+ :tasks
+ {:requires ([release :as release]
+             [release-test :as release-test]
+             [clojure.test :as test])
+  release {:doc "Check for new Datomic version and update flake"
+           :task (release/release! {})}
+
+  release:build {:doc "Update and verify builds"
+                 :task (release/release! {:build? true})}
+
+  test {:doc "Run tests"
+        :task (test/run-tests 'release-test)}}}

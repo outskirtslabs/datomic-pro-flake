@@ -57,6 +57,8 @@ And for peer:
 -  `pkgs.datomic-pro-peer_1_0_7364`
 -  `pkgs.datomic-pro-peer_1_0_7277`
 
+New versions are typically available within 24 hours of an official Datomic release.
+
 ## Usage - NixOS Module
 
 ### `flake.nix`

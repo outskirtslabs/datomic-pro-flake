@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - NixOS module: The `services.datomic-pro.package` option is now required. You must explicitly pin your Datomic version. This change prevents unexpected upgrades that could affect your data.
 
+### Added
+
+- Add automatic version bumping. Thanks to @licht1stein for contributing.
+
 ## v0.10.0 (2026-02-03)
 
 This is a version bump release:
