@@ -6,7 +6,6 @@
 }:
 
 let
-  inherit (config.system) stateVersion;
   cfg = config.services.datomic-pro;
   settingsFormat = pkgs.formats.javaProperties { };
   stateDir = "/var/lib/${cfg.stateDirectoryName}";
@@ -29,12 +28,15 @@ in
       enable = lib.mkEnableOption "Datomic Pro";
       package = lib.mkOption {
         type = lib.types.package;
-        description = "Which datomic-pro package to use.";
+        description = ''
+          The datomic-pro package to use. This option is required and has no default
+          to ensure you explicitly pin your Datomic version and avoid unexpected upgrades.
+        '';
         relatedPackages = [
+          "datomic-pro_1_0_7482"
           "datomic-pro_1_0_7469"
           "datomic-pro_1_0_7394"
           "datomic-pro_1_0_7387"
-          "datomic-pro_1_0_7364"
         ];
       };
       secretsFile = lib.mkOption {
@@ -173,33 +175,12 @@ in
 
       {
         assertion = !(lib.attrsets.hasAttr "log-dir" cfg.settings);
-        message = ''<option>services.datomic-pro.settings</option> must not contain the `log-dir` key, use <option>services.datomic-pro.logbackConfig</option> instead.'';
+        message = "<option>services.datomic-pro.settings</option> must not contain the `log-dir` key, use <option>services.datomic-pro.logbackConfig</option> instead.";
         # Ok intrepid spelunker, why can we not use log-dir? Because as of 2024-10, the log-dir is specially handled by datomic code and hardcodes a lookup for
         # logback.xml in the `bin/` dir of the datomic tarball. This obviously doesn't work on NixOS.
         # The solution is to NOT define log-dir, but instead just define your own logback configuration, we include a variation of the default that logs to stdout and ends up in systemd's journal.
       }
     ];
-    services.datomic-pro.package =
-      let
-        mkThrow = ver: throw "datomic-pro_${ver} was removed, please upgrade your datomic-pro version.";
-        mkWarn =
-          ver:
-          lib.warn ''
-            The datomic-pro package is not pinned and selected automatically by
-            `system.stateVersion`. Right now this is `pkgs.datomic-pro_${ver}`, the
-            oldest datomic-pro version available.
-          '';
-        base =
-          if lib.versionAtLeast config.system.stateVersion "26.05" then
-            pkgs.datomic-pro_1_0_7469
-          else if lib.versionAtLeast config.system.stateVersion "25.11" then
-            pkgs.datomic-pro_1_0_7387
-          else if lib.versionAtLeast config.system.stateVersion "24.11" then
-            pkgs.datomic-pro_1_0_7364
-          else
-            mkWarn pkgs.datomic-pro_1_0_7277;
-      in
-      lib.mkDefault base;
 
     systemd.services.datomic-pro = {
       description = "Datomic Pro";
