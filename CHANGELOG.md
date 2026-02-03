@@ -6,6 +6,32 @@ This project uses [**Break Versioning**](https://www.taoensso.com/break-versioni
 
 ## [UNRELEASED]
 
+## v0.12.0 (2026-02-03)
+
+This is a version bump release:
+
+- Added package versions for [version 1.0.7491](https://docs.datomic.com/changes/pro.html#1.0.7491)
+
+`pkgs.datomic-pro` will always be the latest release, but the following specific versions are also available:
+
+-  `pkgs.datomic-pro_1_0_7491` (latest)
+-  `pkgs.datomic-pro_1_0_7482`
+-  `pkgs.datomic-pro_1_0_7469`
+-  `pkgs.datomic-pro_1_0_7394`
+-  `pkgs.datomic-pro_1_0_7387`
+-  `pkgs.datomic-pro_1_0_7364`
+-  `pkgs.datomic-pro_1_0_7277`
+
+And for peer:
+
+-  `pkgs.datomic-pro-peer_1_0_7491` (latest)
+-  `pkgs.datomic-pro-peer_1_0_7482`
+-  `pkgs.datomic-pro-peer_1_0_7469`
+-  `pkgs.datomic-pro-peer_1_0_7394`
+-  `pkgs.datomic-pro-peer_1_0_7387`
+-  `pkgs.datomic-pro-peer_1_0_7364`
+-  `pkgs.datomic-pro-peer_1_0_7277`
+
 ## v0.11.0 (2026-02-03)
 
 ### Breaking
