@@ -41,7 +41,8 @@ All of the above are [end-to-end tested](./tests) by the CI suite in this repo!
 
 `pkgs.datomic-pro` will always be the latest release, but the following specific versions are also available:
 
--  `pkgs.datomic-pro_1_0_7482` (latest)
+-  `pkgs.datomic-pro_1_0_7491` (latest)
+-  `pkgs.datomic-pro_1_0_7482`
 -  `pkgs.datomic-pro_1_0_7469`
 -  `pkgs.datomic-pro_1_0_7394`
 -  `pkgs.datomic-pro_1_0_7387`
@@ -50,7 +51,8 @@ All of the above are [end-to-end tested](./tests) by the CI suite in this repo!
 
 And for peer:
 
--  `pkgs.datomic-pro-peer_1_0_7482` (latest)
+-  `pkgs.datomic-pro-peer_1_0_7491` (latest)
+-  `pkgs.datomic-pro-peer_1_0_7482`
 -  `pkgs.datomic-pro-peer_1_0_7469`
 -  `pkgs.datomic-pro-peer_1_0_7394`
 -  `pkgs.datomic-pro-peer_1_0_7387`
@@ -119,7 +121,7 @@ A basic dev-mode datomic that stores its state in `/var/lib/datomic-pro`:
 {
     services.datomic-pro = {
         enable = true;
-        package = pkgs.datomic-pro_1_0_7482;
+        package = pkgs.datomic-pro_1_0_7491;
         secretsFile = "/etc/datomic-pro/secrets.properties";
         settings = {
             # no secrets in here!
@@ -152,7 +154,7 @@ This flake also provides a container image for Datomic Pro that can be driven en
 If you don't want to build the container image yourself with nix, you can get the latest image with:
 
 ``` shell
-docker/podman pull ghcr.io/outskirtslabs/datomic-pro:1.0.7482
+docker/podman pull ghcr.io/outskirtslabs/datomic-pro:1.0.7491
 ```
 
 The available tags you can find here: https://github.com/orgs/outskirtslabs/packages/datomic-pro-flake/package/datomic-pro
@@ -235,7 +237,7 @@ Be sure to `mkdir data/ config/` before running this.
 ---
 services:
   datomic-transactor:
-    image: ghcr.io/outskirtslabs/datomic-pro:1.0.7482
+    image: ghcr.io/outskirtslabs/datomic-pro:1.0.7491
     environment:
       DATOMIC_STORAGE_ADMIN_PASSWORD: unsafe
       DATOMIC_STORAGE_DATOMIC_PASSWORD: unsafe
@@ -246,7 +248,7 @@ services:
     #user: 1000:1000 # if using rootful containers uncomment this
 
   datomic-console:
-    image: ghcr.io/outskirtslabs/datomic-pro:1.0.7482
+    image: ghcr.io/outskirtslabs/datomic-pro:1.0.7491
     command: console
     environment:
       DB_URI: datomic:dev://datomic-transactor:4334/?password=unsafe
@@ -355,7 +357,7 @@ services:
       retries: 30
 
   datomic-storage-migrator:
-    image: ghcr.io/outskirtslabs/datomic-pro:1.0.7482
+    image: ghcr.io/outskirtslabs/datomic-pro:1.0.7491
     environment:
       PGUSER: postgres
       PGPASSWORD: unsafe
@@ -371,7 +373,7 @@ services:
         condition: service_healthy
 
   datomic-transactor:
-    image: ghcr.io/outskirtslabs/datomic-pro:1.0.7482
+    image: ghcr.io/outskirtslabs/datomic-pro:1.0.7491
     environment:
       DATOMIC_STORAGE_ADMIN_PASSWORD: unsafe
       DATOMIC_STORAGE_DATOMIC_PASSWORD: unsafe
@@ -402,7 +404,7 @@ services:
         condition: service_completed_successfully
 
   datomic-console:
-    image: ghcr.io/outskirtslabs/datomic-pro:1.0.7482
+    image: ghcr.io/outskirtslabs/datomic-pro:1.0.7491
     command: console
     environment:
       DB_URI: datomic:sql://?jdbc:postgresql://datomic-storage:5432/datomic?user=datomic&password=datomic
