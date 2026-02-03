@@ -44,6 +44,7 @@ makeTest {
         };
         services.datomic-pro = {
           enable = true;
+          package = datomic-pro;
           secretsFile = "/etc/datomic-pro/do-not-do-this.properties";
           settings = {
             host = "localhost";
