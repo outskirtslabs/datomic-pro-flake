@@ -2,14 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+This project uses [**Break Versioning**](https://www.taoensso.com/break-versioning).
 
 ## [UNRELEASED]
+
+## v0.11.0 (2026-02-03)
 
 ### Breaking
 
 - NixOS module: The `services.datomic-pro.package` option is now required. You must explicitly pin your Datomic version. This change prevents unexpected upgrades that could affect your data.
+- Switch from [SemVer](https://semver.org/spec/v2.0.0.html) to [BreakVer](https://www.taoensso.com/break-versioning). I actually had meant to use BreakVer all along and thought we were, but didn't see the copy paste error until just now (yes this is a violation of SemVer by not bumping the major version number).
 
 ### Added
 
