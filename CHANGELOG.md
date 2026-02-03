@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [UNRELEASED]
 
+## v0.10.0 (2026-02-03)
+
 This is a version bump release:
 
 - Added package versions for [version 1.0.7482](https://docs.datomic.com/changes/pro.html#1.0.7482)
