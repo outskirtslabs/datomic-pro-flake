@@ -1,0 +1,46 @@
+---
+name: Update Datomic Version
+
+on:
+  schedule:
+    - cron: '0 8 * * *'
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/determinate-nix-action@v3
+      - uses: DeterminateSystems/flakehub-cache-action@main
+
+      - name: Check for updates
+        id: release
+        run: |
+          nix develop --command bb release:build
+          if git diff --quiet pkgs/versions.nix README.md CHANGELOG.md nixos-modules/datomic-pro.nix; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "version=$(nix eval --raw .#datomic-pro.version)" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create PR
+        if: steps.release.outputs.changed == 'true'
+        run: |
+          BRANCH="auto-update/datomic-${{ steps.release.outputs.version }}"
+          git config user.name "Casey Link"
+          git config user.email "14830+Ramblurr@users.noreply.github.com"
+          git checkout -b "$BRANCH"
+          git add pkgs/versions.nix README.md CHANGELOG.md nixos-modules/datomic-pro.nix
+          git commit -m "Add datomic-pro ${{ steps.release.outputs.version }}"
+          git push -u origin "$BRANCH"
+          gh pr create \
+            --title "Add datomic-pro ${{ steps.release.outputs.version }}" \
+            --body "Automated update to Datomic Pro ${{ steps.release.outputs.version }}" \
+            --label "auto-update"
+        env:
+          GH_TOKEN: ${{ github.token }}

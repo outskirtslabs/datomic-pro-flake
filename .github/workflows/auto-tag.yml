@@ -1,0 +1,31 @@
+---
+name: Auto Tag Release
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+jobs:
+  tag:
+    if: github.event.pull_request.merged == true && contains(github.event.pull_request.labels.*.name, 'auto-update')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Extract version from CHANGELOG
+        id: version
+        run: |
+          VERSION=$(grep -m1 '^## v[0-9]' CHANGELOG.md | sed 's/## \(v[0-9.]*\).*/\1/')
+          echo "tag=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Create and push tag
+        run: |
+          git config user.name "Casey Link"
+          git config user.email "14830+Ramblurr@users.noreply.github.com"
+          git tag -a "${{ steps.version.outputs.tag }}" -m "Release ${{ steps.version.outputs.tag }}"
+          git push origin "${{ steps.version.outputs.tag }}"
