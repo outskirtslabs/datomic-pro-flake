@@ -3,7 +3,7 @@ name: Update Datomic Version
 
 on:
   schedule:
-    - cron: '0 8 * * *'
+    - cron: "0 8 * * *"
   workflow_dispatch:
 
 jobs:
@@ -35,6 +35,7 @@ jobs:
           BRANCH="auto-update/datomic-${{ steps.release.outputs.version }}"
           git config user.name "Casey Link"
           git config user.email "14830+Ramblurr@users.noreply.github.com"
+          git push origin --delete "$BRANCH" 2>/dev/null || true
           git checkout -b "$BRANCH"
           git add pkgs/versions.nix README.md CHANGELOG.md nixos-modules/datomic-pro.nix
           git commit -m "Add datomic-pro ${{ steps.release.outputs.version }}"
