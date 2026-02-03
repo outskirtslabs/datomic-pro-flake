@@ -8,7 +8,7 @@ on:
 
 jobs:
   tag:
-    if: github.event.pull_request.merged == true && contains(github.event.pull_request.labels.*.name, 'auto-update')
+    if: github.event.pull_request.merged == true && startsWith(github.event.pull_request.title, 'Add datomic-pro')
     runs-on: ubuntu-latest
     permissions:
       contents: write

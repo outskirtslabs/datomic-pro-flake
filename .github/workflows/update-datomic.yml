@@ -42,7 +42,6 @@ jobs:
           git push -u origin "$BRANCH"
           gh pr create \
             --title "Add datomic-pro ${{ steps.release.outputs.version }}" \
-            --body "Automated update to Datomic Pro ${{ steps.release.outputs.version }}" \
-            --label "auto-update"
+            --body "Automated update to Datomic Pro ${{ steps.release.outputs.version }}"
         env:
           GH_TOKEN: ${{ github.token }}
