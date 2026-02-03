@@ -25,7 +25,7 @@
                     version version)
         {:keys [out exit]}
         (shell {:out :string :err :string}
-               "nix-prefetch-url" "--type" "sha256" url)]
+               "nix-prefetch-url" "--unpack" "--type" "sha256" url)]
     (when (zero? exit)
       (let [base32-hash (str/trim out)
             {:keys [out exit]}

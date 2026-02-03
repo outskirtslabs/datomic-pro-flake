@@ -7,12 +7,12 @@
 ️ This flake exposes:
 
 * A `datomic-pro` nix package (and `console`, and `peer`)
-* ❄ NixOS modules for running Datomic Pro on NixOS
-* 🐋 A container image that you can use to run Datomic Pro (no nix required!)
+* NixOS modules for running Datomic Pro on NixOS
+* A container image that you can use to run Datomic Pro (no nix required!)
 
 All of the above are [end-to-end tested](./tests) by the CI suite in this repo!
 
-**Project status:** Experimental but ready for testing. Breaking changes may occur until version 1.0. The 1.0 release will be considered production-ready.
+**Project status:** Actively used in production, but still pre-1.0. Breaking changes may occur until version 1.0. The 1.0 release will be considered production-ready. [Experience reports welcome](https://casey.link/about#contact).
 
 <!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-refresh-toc -->
 **Table of Contents**
