@@ -17,11 +17,13 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Extract version from CHANGELOG
+      - name: Extract version and release notes from CHANGELOG
         id: version
         run: |
           VERSION=$(grep -m1 '^## v[0-9]' CHANGELOG.md | sed 's/## \(v[0-9.]*\).*/\1/')
           echo "tag=$VERSION" >> $GITHUB_OUTPUT
+          # Extract content between this version and the next version header (or EOF)
+          awk '/^## v[0-9]/{if(found) exit; found=1; next} found' CHANGELOG.md > release_notes.md
 
       - name: Create and push tag
         run: |
@@ -29,3 +31,11 @@ jobs:
           git config user.email "14830+Ramblurr@users.noreply.github.com"
           git tag -a "${{ steps.version.outputs.tag }}" -m "Release ${{ steps.version.outputs.tag }}"
           git push origin "${{ steps.version.outputs.tag }}"
+
+      - name: Create GitHub release
+        run: |
+          gh release create "${{ steps.version.outputs.tag }}" \
+            --title "${{ steps.version.outputs.tag }}" \
+            --notes-file release_notes.md
+        env:
+          GH_TOKEN: ${{ github.token }}
