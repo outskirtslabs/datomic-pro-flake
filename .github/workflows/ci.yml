@@ -13,7 +13,7 @@ on:
       tag:
         description: "The existing tag to publish to FlakeHub"
         type: "string"
-        required: true
+        required: false
 
 jobs:
   check:
