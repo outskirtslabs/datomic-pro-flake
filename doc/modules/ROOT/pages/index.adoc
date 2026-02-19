@@ -5,7 +5,7 @@ Datomic Pro packaged for Nix w/ NixOS modules and OCI container images.
 ____
 
 image:https://img.shields.io/badge/doc-outskirtslabs-orange.svg[doc,link=https://docs.outskirtslabs.com/datomic-pro-flake/next/]
-image:https://img.shields.io/badge/status-maturing-yellow.svg[status: maturing,link=https://docs.outskirtslabs.com/open-source-vital-signs#maturing]
+image:https://img.shields.io/badge/status-stable-brightgreen.svg[status: stable,link=https://docs.outskirtslabs.com/open-source-vital-signs#stable]
 https://github.com/outskirtslabs/datomic-pro-flake/blob/main/LICENSE[image:https://img.shields.io/github/license/outskirtslabs/datomic-pro-flake[License]]
 
 `datomic-pro-flake` provides:
@@ -16,7 +16,7 @@ https://github.com/outskirtslabs/datomic-pro-flake/blob/main/LICENSE[image:https
 
 All outputs are tested end-to-end in this repository.
 
-Project status: *https://docs.outskirtslabs.com/open-source-vital-signs#maturing[Maturing]*.
+Project status: *https://docs.outskirtslabs.com/open-source-vital-signs#stable[Stable]*.
 
 == Quick Start
 

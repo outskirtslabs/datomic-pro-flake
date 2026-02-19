@@ -4,7 +4,7 @@
            :description "Nix flake packaging Datomic Pro with NixOS modules and OCI images"
            :license "Apache-2.0"
            :platforms [:nix :linux :docker]
-           :status :maturing
+           :status :stable
            :created "2024-06-12"
            :version "0.0.0"}
  :docs {:component "datomic-pro-flake"
