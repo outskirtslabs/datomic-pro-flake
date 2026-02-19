@@ -1,0 +1,7 @@
+---
+name: datomic-pro-flake
+title: datomic-pro-flake
+version: next
+prerelease: true
+nav:
+  - modules/ROOT/nav.adoc

@@ -1,0 +1,71 @@
+= datomic-pro-flake
+
+____
+Datomic Pro packaged for Nix w/ NixOS modules and OCI container images.
+____
+
+image:https://img.shields.io/badge/doc-outskirtslabs-orange.svg[doc,link=https://docs.outskirtslabs.com/datomic-pro-flake/next/]
+image:https://img.shields.io/badge/status-maturing-yellow.svg[status: maturing,link=https://docs.outskirtslabs.com/open-source-vital-signs#maturing]
+https://github.com/outskirtslabs/datomic-pro-flake/blob/main/LICENSE[image:https://img.shields.io/github/license/outskirtslabs/datomic-pro-flake[License]]
+
+`datomic-pro-flake` provides:
+
+* Versioned `datomic-pro` and `datomic-pro-peer` nix packages.
+* NixOS modules for running Datomic Pro transactor and Datomic Console.
+* An OCI image (no nix requiredd!) for running transactor or console with environment variables and `_FILE` secrets.
+
+All outputs are tested end-to-end in this repository.
+
+Project status: *https://docs.outskirtslabs.com/open-source-vital-signs#maturing[Maturing]*.
+
+== Quick Start
+
+[source,nix]
+----
+{
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    datomic-pro.url = "github:outskirtslabs/datomic-pro-flake";
+    datomic-pro.inputs.nixpkgs.follows = "nixpkgs";
+  };
+
+  outputs = { nixpkgs, datomic-pro, ... }:
+    let
+      system = "x86_64-linux";
+    in {
+      nixosConfigurations.example = nixpkgs.lib.nixosSystem {
+        inherit system;
+        modules = [
+          ./configuration.nix
+          datomic-pro.nixosModules.${system}.datomic-pro
+        ];
+      };
+    };
+}
+----
+
+
+== Documentation
+
+
+To learn how to configure the module and OCI container, see:
+
+* xref:nixos-module.adoc[NixOS Module]
+* xref:docker-oci-container.adoc[Docker/OCI Container]
+* https://docs.outskirtslabs.com/datomic-pro-flake/next/[Docs Home]
+* https://github.com/outskirtslabs/datomic-pro-flake/issues[Support via GitHub Issues]
+
+== Security
+
+ifdef::env-github[]
+See link:./SECURITY.adoc[SECURITY.adoc] for security reporting and policy links.
+endif::[]
+ifndef::env-github[]
+See xref:security.adoc[Security] for security reporting and policy links.
+endif::[]
+
+== License
+
+Copyright © 2025-2026 Casey Link <casey@outskirtslabs.com>
+
+Distributed under the https://spdx.org/licenses/Apache-2.0.html[Apache License 2.0].

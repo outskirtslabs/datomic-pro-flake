@@ -20,10 +20,10 @@ jobs:
       - name: Extract version and release notes from CHANGELOG
         id: version
         run: |
-          VERSION=$(grep -m1 '^## v[0-9]' CHANGELOG.md | sed 's/## \(v[0-9.]*\).*/\1/')
-          echo "tag=$VERSION" >> $GITHUB_OUTPUT
+          VERSION=$(grep -m1 '^== v[0-9]' CHANGELOG.adoc | sed 's/== \(v[0-9.]*\).*/\1/')
+          echo "tag=$VERSION" >> "$GITHUB_OUTPUT"
           # Extract content between this version and the next version header (or EOF)
-          awk '/^## v[0-9]/{if(found) exit; found=1; next} found' CHANGELOG.md > release_notes.md
+          awk '/^== v[0-9]/{if(found) exit; found=1; next} found' CHANGELOG.adoc > release_notes.adoc
 
       - name: Create and push tag
         run: |
@@ -36,6 +36,6 @@ jobs:
         run: |
           gh release create "${{ steps.version.outputs.tag }}" \
             --title "${{ steps.version.outputs.tag }}" \
-            --notes-file release_notes.md
+            --notes-file release_notes.adoc
         env:
           GH_TOKEN: ${{ github.token }}

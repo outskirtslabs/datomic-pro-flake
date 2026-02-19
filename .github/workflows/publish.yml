@@ -1,0 +1,129 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+---
+name: Publish [post-garnix]
+on:
+  check_suite:
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "The existing tag to publish to FlakeHub"
+        type: string
+        required: false
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  publish-unstable-image:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+      packages: write
+    if: |
+      (
+        (github.ref == 'refs/heads/main' || github.event.check_suite.head_branch == 'main')
+        && !contains(
+          github.event.head_commit.message
+          || github.event.check_suite.head_commit.message
+          || '',
+          'no-publish'
+        )
+        && (
+          github.event_name == 'workflow_dispatch'
+          || (
+            github.event.check_suite.app.slug == 'garnix'
+            && github.event.check_suite.conclusion == 'success'
+          )
+        )
+      )
+    steps:
+      - uses: actions/checkout@v6
+      - uses: DeterminateSystems/determinate-nix-action@v3
+        with:
+          extra-conf: |
+            extra-substituters = https://cache.garnix.io
+            extra-trusted-public-keys = cache.garnix.io:CTFPyKSLcx5RMJKfLo5EEPUObbA78b0YQ2DTCJXqr9g=
+      - uses: DeterminateSystems/flakehub-cache-action@main
+      - name: Build datomic-pro oci image
+        run: nix build .#datomic-pro-container -o container
+      - name: Push unstable container image
+        run: |
+          nix develop --ignore-environment --command skopeo copy --dest-creds="outskirtslabs:${{ github.token }}" docker-archive:./container docker://ghcr.io/outskirtslabs/datomic-pro:unstable
+
+  publish-release:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+      packages: write
+    if: |
+      (
+        !contains(
+          github.event.head_commit.message
+          || github.event.check_suite.head_commit.message
+          || '',
+          'no-publish'
+        )
+        && (
+          github.event_name == 'workflow_dispatch'
+          || (
+            github.event.check_suite.app.slug == 'garnix'
+            && github.event.check_suite.conclusion == 'success'
+          )
+        )
+      )
+    steps:
+      - name: Verify tag format
+        if: github.event_name == 'workflow_dispatch' && inputs.tag != ''
+        run: |
+          if [[ ! "${{ inputs.tag }}" =~ ^v ]]; then
+            echo "Error: Tag must start with 'v' prefix"
+            exit 1
+          fi
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          ref: "${{ github.event_name == 'workflow_dispatch' && format('refs/tags/{0}', inputs.tag) || github.event.check_suite.head_sha || github.ref }}"
+      - name: Resolve release tag
+        id: release-tag
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            TAG="${{ inputs.tag }}"
+          else
+            git fetch --tags --force
+            TAG="$(git tag --points-at HEAD | grep '^v' | head -n1 || true)"
+          fi
+
+          if [ -n "$TAG" ]; then
+            echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+            echo "publish=true" >> "$GITHUB_OUTPUT"
+            echo "Resolved release tag: $TAG"
+          else
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+            echo "No release tag on this commit; skipping release publish"
+          fi
+      - uses: DeterminateSystems/determinate-nix-action@v3
+        if: steps.release-tag.outputs.publish == 'true'
+        with:
+          extra-conf: |
+            extra-substituters = https://cache.garnix.io
+            extra-trusted-public-keys = cache.garnix.io:CTFPyKSLcx5RMJKfLo5EEPUObbA78b0YQ2DTCJXqr9g=
+      - uses: DeterminateSystems/flakehub-cache-action@main
+        if: steps.release-tag.outputs.publish == 'true'
+      - name: Build datomic-pro oci image
+        if: steps.release-tag.outputs.publish == 'true'
+        run: nix build .#datomic-pro-container -o container
+      - name: Push versioned container image
+        if: steps.release-tag.outputs.publish == 'true'
+        run: |
+          datomic_version=$(grep "version =" pkgs/versions.nix | head -n1 | cut -d'"' -f2)
+          nix develop --ignore-environment --command skopeo copy --dest-creds="outskirtslabs:${{ github.token }}" docker-archive:./container "docker://ghcr.io/outskirtslabs/datomic-pro:${datomic_version}"
+      - uses: DeterminateSystems/flakehub-push@main
+        if: steps.release-tag.outputs.publish == 'true'
+        with:
+          visibility: public
+          name: outskirtslabs/datomic-pro
+          tag: "${{ steps.release-tag.outputs.tag }}"

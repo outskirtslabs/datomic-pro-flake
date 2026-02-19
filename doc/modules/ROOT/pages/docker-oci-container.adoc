@@ -1,0 +1,226 @@
+= Docker/OCI Container
+
+`datomic-pro-flake` publishes an OCI image that can run Datomic Pro transactor or Datomic Console.
+
+* Image: `ghcr.io/outskirtslabs/datomic-pro`
+* Default command: transactor
+* Console command: `console`
+
+If you do not want to build with nix, pull a published image:
+
+[source,shell]
+----
+docker pull ghcr.io/outskirtslabs/datomic-pro:1.0.7491
+----
+
+Package tags are listed at:
+https://github.com/orgs/outskirtslabs/packages/container/package/datomic-pro
+
+== Transactor Mode
+
+Transactor mode runs when no command is provided.
+
+* Default port: `4334`
+* Required rw volume: `/config`
+* Optional rw volume: `/data` (for local/H2 or sqlite-style setups)
+* PostgreSQL, MySQL, and SQLite JDBC drivers are included
+
+You can provide `/config/transactor.properties` directly, or configure via env vars.
+
+=== Supported Environment Variables
+
+[IMPORTANT]
+====
+Every supported variable can also be passed with `_FILE` to load the value from a file.
+
+Example: `DATOMIC_STORAGE_ADMIN_PASSWORD_FILE=/run/secrets/admin-password`.
+====
+
+* `DATOMIC_TRANSACTOR_PROPERTIES_PATH` (`/config/transactor.properties`)
+* `DATOMIC_ALT_HOST` (`alt-host`)
+* `DATOMIC_DATA_DIR` (`data-dir`, default `/data`)
+* `DATOMIC_ENCRYPT_CHANNEL` (`encrypt-channel`)
+* `DATOMIC_HEARTBEAT_INTERVAL_MSEC` (`heartbeat-interval-msec`)
+* `DATOMIC_HOST` (`host`, default `0.0.0.0`)
+* `DATOMIC_MEMCACHED` (`memcached`)
+* `DATOMIC_MEMCACHED_AUTO_DISCOVERY` (`memcached-auto-discovery`)
+* `DATOMIC_MEMCACHED_CONFIG_TIMEOUT_MSEC` (`memcached-config-timeout-msec`)
+* `DATOMIC_MEMCACHED_PASSWORD` (`memcached-password`)
+* `DATOMIC_MEMCACHED_USERNAME` (`memcached-username`)
+* `DATOMIC_MEMORY_INDEX_MAX` (`memory-index-max`, default `256m`)
+* `DATOMIC_MEMORY_INDEX_THRESHOLD` (`memory-index-threshold`, default `32m`)
+* `DATOMIC_OBJECT_CACHE_MAX` (`object-cache-max`, default `128m`)
+* `DATOMIC_PID_FILE` (`pid-file`)
+* `DATOMIC_HEALTHCHECK_CONCURRENCY` (`ping-concurrency`)
+* `DATOMIC_HEALTHCHECK_HOST` (`ping-host`)
+* `DATOMIC_HEALTHCHECK_PORT` (`ping-port`)
+* `DATOMIC_PORT` (`port`, default `4334`)
+* `DATOMIC_PROTOCOL` (`protocol`, default `dev`)
+* `DATOMIC_READ_CONCURRENCY` (`read-concurrency`)
+* `DATOMIC_SQL_DRIVER_CLASS` (`sql-driver-class`)
+* `DATOMIC_SQL_URL` (`sql-url`)
+* `DATOMIC_STORAGE_ACCESS` (`storage-access`, default `remote`)
+* `DATOMIC_STORAGE_ADMIN_PASSWORD` (`storage-admin-password`)
+* `DATOMIC_STORAGE_DATOMIC_PASSWORD` (`storage-datomic-password`)
+* `DATOMIC_VALCACHE_MAX_GB` (`valcache-max-gb`)
+* `DATOMIC_VALCACHE_PATH` (`valcache-path`)
+* `DATOMIC_WRITE_CONCURRENCY` (`write-concurrency`)
+
+To disable env-to-properties generation and use your own full config file, set:
+
+* `DOCKER_DATOMIC_GENERATE_PROPERTIES_SKIP` to any non-empty value
+
+== Console Mode
+
+Run with `console` as the first argument.
+
+* Default port: `8080`
+* `DB_URI` sets the connection URI
+* `DB_URI_FILE` loads the URI from a file
+
+== Example Compose
+
+=== Datomic Pro With Local Storage
+
+[source,yaml]
+----
+---
+services:
+  datomic-transactor:
+    image: ghcr.io/outskirtslabs/datomic-pro:1.0.7491
+    environment:
+      DATOMIC_STORAGE_ADMIN_PASSWORD: unsafe
+      DATOMIC_STORAGE_DATOMIC_PASSWORD: unsafe
+    volumes:
+      - ./data:/data
+    ports:
+      - 127.0.0.1:4334:4334
+
+  datomic-console:
+    image: ghcr.io/outskirtslabs/datomic-pro:1.0.7491
+    command: console
+    environment:
+      DB_URI: datomic:dev://datomic-transactor:4334/?password=unsafe
+    ports:
+      - 127.0.0.1:8081:8080
+----
+
+=== Datomic Pro With SQLite Storage
+
+Prepare the sqlite database first:
+
+[source,shell]
+----
+mkdir -p data/ config/
+sqlite3 data/datomic-sqlite.db '
+PRAGMA foreign_keys = ON;
+PRAGMA journal_mode = WAL;
+PRAGMA synchronous = NORMAL;
+PRAGMA mmap_size = 134217728;
+PRAGMA journal_size_limit = 67108864;
+PRAGMA cache_size = 2000;
+CREATE TABLE datomic_kvs (
+    id TEXT NOT NULL,
+    rev INTEGER,
+    map TEXT,
+    val BYTEA,
+    CONSTRAINT pk_id PRIMARY KEY (id)
+);'
+----
+
+Then run compose:
+
+[source,yaml]
+----
+---
+services:
+  datomic-transactor:
+    image: ghcr.io/outskirtslabs/datomic-pro:unstable
+    environment:
+      DATOMIC_PROTOCOL: sql
+      DATOMIC_SQL_URL: jdbc:sqlite:/data/datomic-sqlite.db
+      DATOMIC_SQL_DRIVER_CLASS: org.sqlite.JDBC
+      DATOMIC_JAVA_OPTS: -Dlogback.configurationFile=/config/logback.xml
+      DATOMIC_HOST: datomic-transactor
+      DATOMIC_ALT_HOST: "127.0.0.1"
+    volumes:
+      - "./data:/data:z"
+      - "./config:/config:z"
+    ports:
+      - 127.0.0.1:4334:4334
+
+  datomic-console:
+    image: ghcr.io/outskirtslabs/datomic-pro:unstable
+    command: console
+    environment:
+      DB_URI: "datomic:sql://?jdbc:sqlite:/data/datomic-sqlite.db"
+    volumes:
+      - "./data:/data:z"
+    ports:
+      - 127.0.0.1:8081:8080
+----
+
+=== Datomic Pro With PostgreSQL And Memcached
+
+[source,yaml]
+----
+---
+services:
+  datomic-memcached:
+    image: docker.io/memcached:latest
+    command: memcached -m 1024
+    ports:
+      - 127.0.0.1:11211:11211
+    restart: always
+
+  datomic-storage:
+    image: docker.io/library/postgres:latest
+    environment:
+      POSTGRES_PASSWORD: unsafe
+    command: postgres -c 'max_connections=1024'
+    volumes:
+      - ./data:/var/lib/postgresql/data
+    ports:
+      - 127.0.0.1:5432:5432
+    restart: always
+
+  datomic-storage-migrator:
+    image: ghcr.io/outskirtslabs/datomic-pro:1.0.7491
+    environment:
+      PGUSER: postgres
+      PGPASSWORD: unsafe
+    volumes:
+      - "./postgres-migrations:/migrations"
+    entrypoint: /bin/sh
+    command: >
+      -c '(psql -h datomic-storage -lqt | cut -d \| -f 1 | grep -qw "datomic" || psql -h datomic-storage -f /opt/datomic-pro/bin/sql/postgres-db.sql) &&
+             (psql -h datomic-storage -d datomic -c "\\dt" | grep -q "datomic_kvs" || psql -h datomic-storage -d datomic -f /opt/datomic-pro/bin/sql/postgres-table.sql) &&
+             (psql -h datomic-storage -d datomic -c "\\du" | cut -d \| -f 1 | grep -qw "datomic" || psql -h datomic-storage -d datomic -f /opt/datomic-pro/bin/sql/postgres-user.sql)'
+
+  datomic-transactor:
+    image: ghcr.io/outskirtslabs/datomic-pro:1.0.7491
+    environment:
+      DATOMIC_STORAGE_ADMIN_PASSWORD: unsafe
+      DATOMIC_STORAGE_DATOMIC_PASSWORD: unsafe
+      DATOMIC_PROTOCOL: sql
+      DATOMIC_SQL_URL: jdbc:postgresql://datomic-storage:5432/datomic?user=datomic&password=datomic
+      DATOMIC_HEALTHCHECK_HOST: 127.0.0.1
+      DATOMIC_HEALTHCHECK_PORT: 9999
+      DATOMIC_MEMCACHED: datomic-memcached:11211
+    ports:
+      - 127.0.0.1:4334:4334
+    restart: always
+
+  datomic-console:
+    image: ghcr.io/outskirtslabs/datomic-pro:1.0.7491
+    command: console
+    environment:
+      DB_URI: datomic:sql://?jdbc:postgresql://datomic-storage:5432/datomic?user=datomic&password=datomic
+    ports:
+      - 127.0.0.1:8081:8080
+----
+
+== Discussion
+
+If something is missing for your deployment style, open an issue:
+https://github.com/outskirtslabs/datomic-pro-flake/issues/new

@@ -1,0 +1,15 @@
+{:manifest/version 1
+ :project {:id "datomic-pro-flake"
+           :coord "outskirtslabs/datomic-pro-flake"
+           :description "Nix flake packaging Datomic Pro with NixOS modules and OCI images"
+           :license "Apache-2.0"
+           :platforms [:nix :linux :docker]
+           :status :maturing
+           :created "2024-06-12"
+           :version "0.0.0"}
+ :docs {:component "datomic-pro-flake"
+        :title "datomic-pro-flake"
+        :version "next"
+        :prerelease true
+        :start-path "doc"}
+ :repo {:url "https://github.com/outskirtslabs/datomic-pro-flake"}}

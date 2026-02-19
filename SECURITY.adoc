@@ -1,0 +1,12 @@
+= Security
+
+Security issues should be reported privately.
+
+Please review the Outskirts Labs policy first:
+https://docs.outskirtslabs.com/security-policy[Outskirts Labs Security Policy]
+
+For this repository specifically:
+
+* https://github.com/outskirtslabs/datomic-pro-flake/security/advisories[Security advisories]
+* https://github.com/outskirtslabs/datomic-pro-flake/security/advisories/new[Report a vulnerability]
+

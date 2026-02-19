@@ -1,0 +1,98 @@
+= NixOS Module
+
+This flake provides NixOS modules for Datomic Pro transactor and Datomic Console.
+
+== Add The Module
+
+[source,nix]
+----
+{
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    datomic-pro.url = "github:outskirtslabs/datomic-pro-flake";
+    datomic-pro.inputs.nixpkgs.follows = "nixpkgs";
+  };
+
+  outputs = { nixpkgs, datomic-pro, ... }:
+    let
+      system = "x86_64-linux";
+    in {
+      nixosConfigurations.machine = nixpkgs.lib.nixosSystem {
+        inherit system;
+        modules = [
+          ./configuration.nix
+          datomic-pro.nixosModules.${system}.datomic-pro
+          datomic-pro.nixosModules.${system}.datomic-console
+        ];
+      };
+    };
+}
+----
+
+== Secrets File
+
+Create `/etc/datomic-pro/secrets.properties`:
+
+[source,properties]
+----
+storage-admin-password=changeme
+storage-datomic-password=changeme
+----
+
+[IMPORTANT]
+====
+Do not use `environment.etc` for secrets. That writes data to the nix store, which is globally readable and can be cached remotely.
+====
+
+Lock down permissions:
+
+[source,shell]
+----
+chown root:root /etc/datomic-pro/secrets.properties
+chmod 0600 /etc/datomic-pro/secrets.properties
+----
+
+== Example Configuration
+
+A basic dev-mode transactor storing data under `/var/lib/datomic-pro`:
+
+[source,nix]
+----
+{
+  services.datomic-pro = {
+    enable = true;
+    package = pkgs.datomic-pro_1_0_7491;
+    secretsFile = "/etc/datomic-pro/secrets.properties";
+    settings = {
+      host = "localhost";
+      port = 4334;
+      memory-index-max = "256m";
+      memory-index-threshold = "32m";
+      object-cache-max = "128m";
+      protocol = "dev";
+      storage-access = "remote";
+    };
+  };
+
+  services.datomic-console = {
+    enable = true;
+    port = 8080;
+    dbUriFile = "/etc/datomic-pro/console-db-uri";
+  };
+}
+----
+
+== Available Packages
+
+`pkgs.datomic-pro` and `pkgs.datomic-pro-peer` track the latest supported Datomic release.
+
+Specific versions are also exposed, for example:
+
+* `pkgs.datomic-pro_1_0_7491`
+* `pkgs.datomic-pro_1_0_7482`
+* `pkgs.datomic-pro_1_0_7469`
+* `pkgs.datomic-pro-peer_1_0_7491`
+* `pkgs.datomic-pro-peer_1_0_7482`
+* `pkgs.datomic-pro-peer_1_0_7469`
+
+New upstream Datomic releases are typically added within 24 hours.

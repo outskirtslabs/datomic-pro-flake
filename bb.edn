@@ -1,13 +1,29 @@
 {:paths ["scripts"]
+ :deps {outskirtslabs/bb-tasks
+        {:git/url "https://github.com/outskirtslabs/bb-tasks"
+         :git/sha "9f7ba90a41f50a5de16075ec27793657532151af"}}
  :tasks
  {:requires ([release :as release]
              [release-test :as release-test]
-             [clojure.test :as test])
-  release {:doc "Check for new Datomic version and update flake"
-           :task (release/release! {})}
+             [clojure.test :as test]
+             [ol.bb-tasks.sync-readme :as sync-readme])
 
-  release:build {:doc "Update and verify builds"
-                 :task (release/release! {:build? true})}
+  sync-readme
+  {:doc "Sync top-level AsciiDoc docs into Antora pages."
+   :task (sync-readme/sync-top-level-docs! {:antora-start-path "doc"})}
 
-  test {:doc "Run tests"
-        :task (test/run-tests 'release-test)}}}
+  gen-docs
+  {:doc "Generate docs required by Antora."
+   :depends [sync-readme]}
+
+  release
+  {:doc "Check for new Datomic version and update flake"
+   :task (release/release! {})}
+
+  release:build
+  {:doc "Update and verify builds"
+   :task (release/release! {:build? true})}
+
+  test
+  {:doc "Run tests"
+   :task (test/run-tests 'release-test)}}}

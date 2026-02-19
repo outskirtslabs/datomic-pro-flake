@@ -110,28 +110,35 @@
         pro-list (->> all-versions
                       (map-indexed (fn [i v]
                                      (if (zero? i)
-                                       (format "-  `pkgs.datomic-pro_%s` (latest)" (version->attr v))
-                                       (format "-  `pkgs.datomic-pro_%s`" (version->attr v)))))
+                                       (format "* `pkgs.datomic-pro_%s` (latest)" (version->attr v))
+                                       (format "* `pkgs.datomic-pro_%s`" (version->attr v)))))
                       (str/join "\n"))
         peer-list (->> all-peer-versions
                        (map-indexed (fn [i v]
                                       (if (zero? i)
-                                        (format "-  `pkgs.datomic-pro-peer_%s` (latest)" (version->attr v))
-                                        (format "-  `pkgs.datomic-pro-peer_%s`" (version->attr v)))))
+                                        (format "* `pkgs.datomic-pro-peer_%s` (latest)" (version->attr v))
+                                        (format "* `pkgs.datomic-pro-peer_%s`" (version->attr v)))))
                        (str/join "\n"))
         pro-section-pattern #"(?s)(`pkgs\.datomic-pro` will always be the latest release, but the following specific versions are also available:\n\n)(-  `pkgs\.datomic-pro_[^`]+`[^\n]*\n)+"
         peer-section-pattern #"(?s)(And for peer:\n\n)(-  `pkgs\.datomic-pro-peer_[^`]+`[^\n]*\n)+"
+        module-section-pattern #"(?s)(Specific versions are also exposed, for example:\n\n)(.*?)(\nNew upstream Datomic releases are typically added within 24 hours\.)"
         docker-tag-pattern #"ghcr\.io/outskirtslabs/datomic-pro:\d+\.\d+\.\d+"
         config-pkg-pattern #"package = pkgs\.datomic-pro_\d+_\d+_\d+;"]
     (-> content
         (str/replace pro-section-pattern (str "$1" pro-list "\n"))
         (str/replace peer-section-pattern (str "$1" peer-list "\n"))
+        (str/replace module-section-pattern
+                     (str "$1"
+                          pro-list
+                          "\n\nAnd for peer:\n\n"
+                          peer-list
+                          "\n$3"))
         (str/replace docker-tag-pattern (str "ghcr.io/outskirtslabs/datomic-pro:" new-version))
         (str/replace config-pkg-pattern (str "package = pkgs.datomic-pro_" attr ";")))))
 
 (defn next-flake-version
   [changelog-content]
-  (let [version-pattern #"## v(\d+)\.(\d+)\.(\d+)"
+  (let [version-pattern #"== v(\d+)\.(\d+)\.(\d+)"
         match (re-find version-pattern changelog-content)]
     (when match
       (let [major (parse-long (nth match 1))
@@ -145,20 +152,20 @@
         pro-list (->> all-versions
                       (map-indexed (fn [i v]
                                      (if (zero? i)
-                                       (format "-  `pkgs.datomic-pro_%s` (latest)" (version->attr v))
-                                       (format "-  `pkgs.datomic-pro_%s`" (version->attr v)))))
+                                       (format "* `pkgs.datomic-pro_%s` (latest)" (version->attr v))
+                                       (format "* `pkgs.datomic-pro_%s`" (version->attr v)))))
                       (str/join "\n"))
         peer-list (->> all-peer-versions
                        (map-indexed (fn [i v]
                                       (if (zero? i)
-                                        (format "-  `pkgs.datomic-pro-peer_%s` (latest)" (version->attr v))
-                                        (format "-  `pkgs.datomic-pro-peer_%s`" (version->attr v)))))
+                                        (format "* `pkgs.datomic-pro-peer_%s` (latest)" (version->attr v))
+                                        (format "* `pkgs.datomic-pro-peer_%s`" (version->attr v)))))
                        (str/join "\n"))]
-    (format "## %s (%s)
+    (format "== %s (%s)
 
 This is a version bump release:
 
-- Added package versions for [version %s](https://docs.datomic.com/changes/pro.html#%s)
+* Added package versions for https://docs.datomic.com/changes/pro.html#%s[version %s]
 
 `pkgs.datomic-pro` will always be the latest release, but the following specific versions are also available:
 
@@ -174,13 +181,13 @@ And for peer:
   (let [lines (str/split-lines content)
         unreleased-idx (->> lines
                             (map-indexed vector)
-                            (filter #(str/starts-with? (second %) "## [UNRELEASED]"))
+                            (filter #(str/starts-with? (second %) "== [UNRELEASED]"))
                             first
                             first)
         next-version-idx (->> lines
                               (map-indexed vector)
                               (filter #(and (> (first %) (or unreleased-idx -1))
-                                            (re-matches #"## v\d+\.\d+\.\d+.*" (second %))))
+                                            (re-matches #"== v\d+\.\d+\.\d+.*" (second %))))
                               first
                               first)]
     (when (and unreleased-idx next-version-idx)
@@ -190,10 +197,10 @@ And for peer:
 (defn update-changelog-content
   [content flake-version datomic-version versions peer-versions date]
   (when (has-unreleased-content? content)
-    (throw (ex-info "CHANGELOG.md has unreleased notes. Please release those manually first."
+    (throw (ex-info "CHANGELOG.adoc has unreleased notes. Please release those manually first."
                     {:type :unreleased-content})))
   (let [entry (generate-changelog-entry flake-version datomic-version versions peer-versions date)
-        before-version-pattern #"(?m)^(## v\d+\.\d+\.\d+)"]
+        before-version-pattern #"(?m)^(== v\d+\.\d+\.\d+)"]
     (str/replace-first content before-version-pattern
                        (str entry "\n\n$1"))))
 
@@ -255,15 +262,31 @@ And for peer:
                 (spit versions-path updated-versions)
                 (println "Updated versions.nix")
 
-                (println "Updating README.md...")
-                (let [readme-path "README.md"
-                      readme-content (slurp readme-path)
-                      updated-readme (update-readme-content readme-content existing-versions existing-peer-versions latest)]
-                  (spit readme-path updated-readme)
-                  (println "Updated README.md"))
+                (println "Updating docs pages...")
+                (let [nixos-doc-path "doc/modules/ROOT/pages/nixos-module.adoc"
+                      nixos-doc-content (slurp nixos-doc-path)
+                      updated-nixos-doc (update-readme-content nixos-doc-content
+                                                               existing-versions
+                                                               existing-peer-versions
+                                                               latest)]
+                  (spit nixos-doc-path updated-nixos-doc)
+                  (println "Updated" nixos-doc-path))
 
-                (println "Updating CHANGELOG.md...")
-                (let [changelog-path "CHANGELOG.md"
+                (let [docker-doc-path "doc/modules/ROOT/pages/docker-oci-container.adoc"
+                      docker-doc-content (slurp docker-doc-path)
+                      updated-docker-doc (update-readme-content docker-doc-content
+                                                               existing-versions
+                                                               existing-peer-versions
+                                                               latest)]
+                  (spit docker-doc-path updated-docker-doc)
+                  (println "Updated" docker-doc-path))
+
+                (println "Running bb gen-docs...")
+                (shell "bb" "gen-docs")
+                (println "Generated synced docs")
+
+                (println "Updating CHANGELOG.adoc...")
+                (let [changelog-path "CHANGELOG.adoc"
                       changelog-content (slurp changelog-path)
                       flake-version (next-flake-version changelog-content)
                       updated-changelog (update-changelog-content changelog-content
@@ -273,7 +296,7 @@ And for peer:
                                                                   existing-peer-versions
                                                                   (today-date))]
                   (spit changelog-path updated-changelog)
-                  (println "Updated CHANGELOG.md"))
+                  (println "Updated CHANGELOG.adoc"))
 
                 (println "Updating nixos-modules/datomic-pro.nix...")
                 (let [module-path "nixos-modules/datomic-pro.nix"

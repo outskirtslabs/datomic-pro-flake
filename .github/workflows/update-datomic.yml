@@ -28,11 +28,11 @@ jobs:
         id: release
         run: |
           nix develop --command bb release:build
-          if git diff --quiet pkgs/versions.nix README.md CHANGELOG.md nixos-modules/datomic-pro.nix; then
-            echo "changed=false" >> $GITHUB_OUTPUT
+          if git diff --quiet pkgs/versions.nix README.adoc doc/modules/ROOT/pages/index.adoc doc/modules/ROOT/pages/nixos-module.adoc doc/modules/ROOT/pages/docker-oci-container.adoc CHANGELOG.adoc SECURITY.adoc doc/modules/ROOT/pages/changelog.adoc doc/modules/ROOT/pages/security.adoc doc/modules/ROOT/nav.adoc nixos-modules/datomic-pro.nix; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
           else
-            echo "changed=true" >> $GITHUB_OUTPUT
-            echo "version=$(nix eval --raw .#datomic-pro.version)" >> $GITHUB_OUTPUT
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "version=$(nix eval --raw .#datomic-pro.version)" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Create PR
@@ -44,8 +44,8 @@ jobs:
           git remote set-url origin "https://x-access-token:${{ steps.app-token.outputs.token }}@github.com/${{ github.repository }}.git"
           git push origin --delete "$BRANCH" 2>/dev/null || true
           git checkout -b "$BRANCH"
-          git add pkgs/versions.nix README.md CHANGELOG.md nixos-modules/datomic-pro.nix
-          git commit -m "Add datomic-pro ${{ steps.release.outputs.version }}"
+          git add pkgs/versions.nix README.adoc doc/modules/ROOT/pages/index.adoc doc/modules/ROOT/pages/nixos-module.adoc doc/modules/ROOT/pages/docker-oci-container.adoc CHANGELOG.adoc SECURITY.adoc doc/modules/ROOT/pages/changelog.adoc doc/modules/ROOT/pages/security.adoc doc/modules/ROOT/nav.adoc nixos-modules/datomic-pro.nix
+          git commit -m "add datomic-pro ${{ steps.release.outputs.version }}"
           git push -u origin "$BRANCH"
           gh pr create \
             --title "Add datomic-pro ${{ steps.release.outputs.version }}" \
