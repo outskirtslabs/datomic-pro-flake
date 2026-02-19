@@ -1,6 +1,6 @@
 ---
 name: datomic-pro-flake
 title: datomic-pro-flake
-version: '""'
+version: '0.12'
 nav:
   - modules/ROOT/nav.adoc
