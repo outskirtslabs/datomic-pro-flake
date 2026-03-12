@@ -1,7 +1,7 @@
 {:paths ["scripts"]
  :deps {outskirtslabs/bb-tasks
         {:git/url "https://github.com/outskirtslabs/bb-tasks"
-         :git/sha "9f7ba90a41f50a5de16075ec27793657532151af"}}
+         :git/sha "b224881d5f6d4ae72c514faede9a5eb0b5f627a8"}}
  :tasks
  {:requires ([release :as release]
              [release-test :as release-test]
