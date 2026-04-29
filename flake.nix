@@ -3,10 +3,9 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     flake-utils.url = "github:numtide/flake-utils";
     clj-nix.url = "github:jlesquembre/clj-nix";
-    snowfall-drift = {
-      url = "github:snowfallorg/drift";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    clj-nix.inputs.nixpkgs.follows = "nixpkgs";
+    snowfall-drift.url = "github:snowfallorg/drift";
+    snowfall-drift.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs =
