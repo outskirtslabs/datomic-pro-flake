@@ -10,7 +10,7 @@ If you do not want to build with nix, pull a published image:
 
 [source,shell]
 ----
-docker pull ghcr.io/outskirtslabs/datomic-pro:1.0.7556
+docker pull ghcr.io/outskirtslabs/datomic-pro:1.0.7622
 ----
 
 Package tags are listed at:
@@ -87,7 +87,7 @@ Run with `console` as the first argument.
 ---
 services:
   datomic-transactor:
-    image: ghcr.io/outskirtslabs/datomic-pro:1.0.7556
+    image: ghcr.io/outskirtslabs/datomic-pro:1.0.7622
     environment:
       DATOMIC_STORAGE_ADMIN_PASSWORD: unsafe
       DATOMIC_STORAGE_DATOMIC_PASSWORD: unsafe
@@ -97,7 +97,7 @@ services:
       - 127.0.0.1:4334:4334
 
   datomic-console:
-    image: ghcr.io/outskirtslabs/datomic-pro:1.0.7556
+    image: ghcr.io/outskirtslabs/datomic-pro:1.0.7622
     command: console
     environment:
       DB_URI: datomic:dev://datomic-transactor:4334/?password=unsafe
@@ -185,7 +185,7 @@ services:
     restart: always
 
   datomic-storage-migrator:
-    image: ghcr.io/outskirtslabs/datomic-pro:1.0.7556
+    image: ghcr.io/outskirtslabs/datomic-pro:1.0.7622
     environment:
       PGUSER: postgres
       PGPASSWORD: unsafe
@@ -198,7 +198,7 @@ services:
              (psql -h datomic-storage -d datomic -c "\\du" | cut -d \| -f 1 | grep -qw "datomic" || psql -h datomic-storage -d datomic -f /opt/datomic-pro/bin/sql/postgres-user.sql)'
 
   datomic-transactor:
-    image: ghcr.io/outskirtslabs/datomic-pro:1.0.7556
+    image: ghcr.io/outskirtslabs/datomic-pro:1.0.7622
     environment:
       DATOMIC_STORAGE_ADMIN_PASSWORD: unsafe
       DATOMIC_STORAGE_DATOMIC_PASSWORD: unsafe
@@ -212,7 +212,7 @@ services:
     restart: always
 
   datomic-console:
-    image: ghcr.io/outskirtslabs/datomic-pro:1.0.7556
+    image: ghcr.io/outskirtslabs/datomic-pro:1.0.7622
     command: console
     environment:
       DB_URI: datomic:sql://?jdbc:postgresql://datomic-storage:5432/datomic?user=datomic&password=datomic
