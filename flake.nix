@@ -73,7 +73,7 @@
               datomic-pro-peer = versions."datomic-pro-peer_${pkgs.lib.removePrefix "datomic-pro_" name}";
             }
           ) datomicVersions
-          // {
+          // (pkgs.lib.optionalAttrs pkgs.stdenv.isLinux {
             # A test of the container image that runs in a VM
             containerImageTest = import ./tests/container-image.nix {
               inherit
@@ -83,7 +83,7 @@
                 self
                 ;
             };
-          };
+          });
         devShells.default = pkgs.mkShell {
           buildInputs = [
             snowfall-drift.packages.${system}.drift
