@@ -41,10 +41,13 @@
           };
         packages = {
           default = self.packages.${system}.datomic-pro;
+        }
+        // builtins.mapAttrs (name: _: pkgs.${name}) versions
+        // pkgs.lib.optionalAttrs pkgs.stdenv.isLinux {
           datomic-pro-container = pkgs.datomic-pro-container;
           datomic-pro-container-unstable = pkgs.datomic-pro-container-unstable;
           datomic-generate-properties = pkgs.datomic-generate-properties;
-        } // builtins.mapAttrs (name: _: pkgs.${name}) versions;
+        };
         nixosModules = {
           datomic-pro = import ./nixos-modules/datomic-pro.nix;
           datomic-console = import ./nixos-modules/datomic-console.nix;
@@ -56,28 +59,29 @@
             ) versions;
 
             packageChecks = pkgs.lib.mapAttrs' (
-              name: package:
-              pkgs.lib.nameValuePair "package-${name}" package
+              name: package: pkgs.lib.nameValuePair "package-${name}" package
             ) self.packages.${system};
 
-            devShellChecks = {
+            devShellChecks = pkgs.lib.optionalAttrs pkgs.stdenv.isLinux {
               devshell-default = self.devShells.${system}.default;
             };
 
-            moduleChecks = builtins.mapAttrs (
-              name: value:
-              # a nixos module test vm for each datomic-pro version
-              import ./tests/nixos-module.nix {
-                inherit
-                  system
-                  pkgs
-                  nixpkgs
-                  self
-                  ;
-                datomic-pro = value;
-                datomic-pro-peer = versions."datomic-pro-peer_${pkgs.lib.removePrefix "datomic-pro_" name}";
-              }
-            ) datomicVersions;
+            moduleChecks = pkgs.lib.optionalAttrs pkgs.stdenv.isLinux (
+              builtins.mapAttrs (
+                name: value:
+                # a nixos module test vm for each datomic-pro version
+                import ./tests/nixos-module.nix {
+                  inherit
+                    system
+                    pkgs
+                    nixpkgs
+                    self
+                    ;
+                  datomic-pro = value;
+                  datomic-pro-peer = versions."datomic-pro-peer_${pkgs.lib.removePrefix "datomic-pro_" name}";
+                }
+              ) datomicVersions
+            );
 
             containerChecks = pkgs.lib.optionalAttrs pkgs.stdenv.isLinux {
               # A test of the container image that runs in a VM
@@ -91,17 +95,16 @@
               };
             };
           in
-          packageChecks
-          // devShellChecks
-          // moduleChecks
-          // containerChecks;
-        devShells.default = pkgs.mkShell {
-          buildInputs = [
-            pkgs.skopeo
-            pkgs.babashka
-            pkgs.dive
-            pkgs.gnumake
-          ];
+          packageChecks // devShellChecks // moduleChecks // containerChecks;
+        devShells = pkgs.lib.optionalAttrs pkgs.stdenv.isLinux {
+          default = pkgs.mkShell {
+            buildInputs = [
+              pkgs.skopeo
+              pkgs.babashka
+              pkgs.dive
+              pkgs.gnumake
+            ];
+          };
         };
       }
     );
