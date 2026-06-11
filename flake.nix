@@ -54,32 +54,47 @@
             datomicVersions = pkgs.lib.filterAttrs (
               name: value: pkgs.lib.hasPrefix "datomic-pro_" name && !pkgs.lib.hasPrefix "datomic-pro-peer_" name
             ) versions;
-          in
-          builtins.mapAttrs (
-            name: value:
-            # a nixos module test vm for each datomic-pro version
-            import ./tests/nixos-module.nix {
-              inherit
-                system
-                pkgs
-                nixpkgs
-                self
-                ;
-              datomic-pro = value;
-              datomic-pro-peer = versions."datomic-pro-peer_${pkgs.lib.removePrefix "datomic-pro_" name}";
-            }
-          ) datomicVersions
-          // (pkgs.lib.optionalAttrs pkgs.stdenv.isLinux {
-            # A test of the container image that runs in a VM
-            containerImageTest = import ./tests/container-image.nix {
-              inherit
-                system
-                pkgs
-                nixpkgs
-                self
-                ;
+
+            packageChecks = pkgs.lib.mapAttrs' (
+              name: package:
+              pkgs.lib.nameValuePair "package-${name}" package
+            ) self.packages.${system};
+
+            devShellChecks = {
+              devshell-default = self.devShells.${system}.default;
             };
-          });
+
+            moduleChecks = builtins.mapAttrs (
+              name: value:
+              # a nixos module test vm for each datomic-pro version
+              import ./tests/nixos-module.nix {
+                inherit
+                  system
+                  pkgs
+                  nixpkgs
+                  self
+                  ;
+                datomic-pro = value;
+                datomic-pro-peer = versions."datomic-pro-peer_${pkgs.lib.removePrefix "datomic-pro_" name}";
+              }
+            ) datomicVersions;
+
+            containerChecks = pkgs.lib.optionalAttrs pkgs.stdenv.isLinux {
+              # A test of the container image that runs in a VM
+              containerImageTest = import ./tests/container-image.nix {
+                inherit
+                  system
+                  pkgs
+                  nixpkgs
+                  self
+                  ;
+              };
+            };
+          in
+          packageChecks
+          // devShellChecks
+          // moduleChecks
+          // containerChecks;
         devShells.default = pkgs.mkShell {
           buildInputs = [
             pkgs.skopeo
