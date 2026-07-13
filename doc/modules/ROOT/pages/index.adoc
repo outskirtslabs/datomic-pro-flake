@@ -6,6 +6,7 @@ ____
 
 image:https://img.shields.io/badge/doc-outskirtslabs-orange.svg[doc,link=https://docs.outskirtslabs.com/datomic-pro-flake/next/]
 image:https://img.shields.io/badge/status-stable-brightgreen.svg[status: stable,link=https://docs.outskirtslabs.com/open-source-vital-signs#stable]
+image:https://ci.outskirtslabs.com/repos/github/outskirtslabs/datomic-pro-flake/badge.svg[alt=nixbot,link=https://ci.outskirtslabs.com/repos/github/outskirtslabs/datomic-pro-flake]
 https://github.com/outskirtslabs/datomic-pro-flake/blob/main/LICENSE[image:https://img.shields.io/github/license/outskirtslabs/datomic-pro-flake[License]]
 
 `datomic-pro-flake` provides:
