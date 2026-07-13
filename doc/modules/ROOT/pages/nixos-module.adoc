@@ -61,7 +61,7 @@ A basic dev-mode transactor storing data under `/var/lib/datomic-pro`:
 {
   services.datomic-pro = {
     enable = true;
-    package = pkgs.datomic-pro_1_0_7622;
+    package = pkgs.datomic-pro_1_0_7705;
     secretsFile = "/etc/datomic-pro/secrets.properties";
     settings = {
       host = "localhost";
@@ -88,7 +88,8 @@ A basic dev-mode transactor storing data under `/var/lib/datomic-pro`:
 
 Specific versions are also exposed, for example:
 
-* `pkgs.datomic-pro_1_0_7622` (latest)
+* `pkgs.datomic-pro_1_0_7705` (latest)
+* `pkgs.datomic-pro_1_0_7622`
 * `pkgs.datomic-pro_1_0_7556`
 * `pkgs.datomic-pro_1_0_7491`
 * `pkgs.datomic-pro_1_0_7482`
@@ -100,7 +101,8 @@ Specific versions are also exposed, for example:
 
 And for peer:
 
-* `pkgs.datomic-pro-peer_1_0_7622` (latest)
+* `pkgs.datomic-pro-peer_1_0_7705` (latest)
+* `pkgs.datomic-pro-peer_1_0_7622`
 * `pkgs.datomic-pro-peer_1_0_7556`
 * `pkgs.datomic-pro-peer_1_0_7491`
 * `pkgs.datomic-pro-peer_1_0_7482`

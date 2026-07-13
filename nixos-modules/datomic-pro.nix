@@ -33,12 +33,11 @@ in
           to ensure you explicitly pin your Datomic version and avoid unexpected upgrades.
         '';
         relatedPackages = [
+          "datomic-pro_1_0_7705"
           "datomic-pro_1_0_7622"
           "datomic-pro_1_0_7556"
           "datomic-pro_1_0_7491"
           "datomic-pro_1_0_7482"
-          "datomic-pro_1_0_7469"
-          "datomic-pro_1_0_7394"
         ];
       };
       secretsFile = lib.mkOption {
