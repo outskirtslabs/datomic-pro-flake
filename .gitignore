@@ -5,6 +5,4 @@ data
 container
 datomic-pro-container-unstable
 datomic-pro-container
-*.md
 .env
-.direnv
